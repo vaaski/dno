@@ -1214,6 +1214,7 @@ function createCanvas(container, width, height, opt_classname) {
  */
 function decodeBase64ToArrayBuffer(base64String) {
   const len = (base64String.length / 4) * 3;
+  debugger
   const str = atob(base64String);
   const arrayBuffer = new ArrayBuffer(len);
   const bytes = new Uint8Array(arrayBuffer);
