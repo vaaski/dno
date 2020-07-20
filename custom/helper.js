@@ -26,7 +26,7 @@
   window.onload = () => {
     const { scrollWidth } = document.documentElement
     const runnerStyles = `.offline #main-frame-error > .runner-container { image-rendering: pixelated; margin: 0; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(${
-      scrollWidth / 600
+      scrollWidth / 1.5 / 600
     }) }`
     const rnst = document.createElement("style")
     rnst.innerHTML = runnerStyles
@@ -35,6 +35,9 @@
     document.firstElementChild.classList.add("offline")
     qq(".icon").forEach(i => i.classList.add("icon-offline"))
 
-    window.r = new Runner(".interstitial-wrapper")
+    window.r = new Runner(".interstitial-wrapper", {
+      MAX_SPEED: 20,
+      ACCELERATION: 0.1,
+    })
   }
 })()

@@ -5,11 +5,11 @@
 // found in the LICENSE file.
 
 const loadSoundFile = url => {
-  return new Promise(function a(res) {
+  return new Promise(function (res) {
     const xhr = new XMLHttpRequest()
     xhr.open("GET", url, true)
     xhr.responseType = "arraybuffer"
-    xhr.onload = function aa() {
+    xhr.onload = function () {
       res(this.response)
     }
     xhr.send()
