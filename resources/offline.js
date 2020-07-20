@@ -24,7 +24,7 @@ const loadSoundFile = url => {
  * @implements {EventListener}
  * @export
  */
-function Runner(outerContainerId, opt_config) {
+function Runner(outerContainerId, opt_config = {}) {
   // Singleton
   if (Runner.instance_) return Runner.instance_
 
@@ -36,7 +36,8 @@ function Runner(outerContainerId, opt_config) {
   // A div to intercept touch events. Only set while (playing && useTouch).
   this.touchController = null
 
-  this.config = opt_config || Runner.config
+  // this.config = opt_config || Runner.config
+  this.config = { ...Runner.config, ...opt_config }
   // Logical dimensions of the container.
   this.dimensions = Runner.defaultDimensions
 
