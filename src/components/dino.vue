@@ -43,6 +43,7 @@ export default {
       self.destroying = true
       self.running = false
       self.ended = true
+      if (!self.crashed) self.runner.playSound(self.runner.soundFx.WON)
       self.reInit()
     })
 
@@ -50,7 +51,7 @@ export default {
   },
   mounted() {
     this.init()
-    this.generateSeed("tester")
+    this.generateSeed()
   },
   beforeDestroy() {
     this.destroy()
@@ -63,7 +64,7 @@ export default {
     },
     init() {
       this.onDino()
-      this.runner = new this.Runner(this.$refs.wrapper)
+      this.runner = new this.Runner(this.$refs.wrapper, { SPEED: 13 })
       this.running = false
       this.waiting = false
     },
@@ -82,7 +83,7 @@ export default {
       this.running = false
       this.crashed = true
       this.socket.emit("crashed", this.room)
-      // this.reInit()
+      this.reInit()
     },
     onStart() {
       console.log("onStart")
@@ -91,7 +92,7 @@ export default {
         self.crashed = false
         self.waiting = true
         self.ended = false
-        self.socket.emit("ready", self.room)
+        self.socket.emit("ready", self.room, seed => self.generateSeed(seed))
         self.socket.once("start", () => {
           self.waiting = false
           self.running = true
@@ -116,6 +117,7 @@ export default {
         obstacleYPosConf: (() => new self.seedrandom(`obstacleYPosConf${seed}`))(),
         gap: (() => new self.seedrandom(`gap${seed}`))(),
         obstacleTypeIndex: (() => new self.seedrandom(`obstacleTypeIndex${seed}`))(),
+        obstacleSpeedOffset: (() => new self.seedrandom(`obstacleSpeedOffset${seed}`))(),
       }
     },
   },

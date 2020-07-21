@@ -240,6 +240,7 @@ Runner.spriteDefinition = {
 Runner.sounds = {
   BUTTON_PRESS: "offline-sound-press",
   HIT: "offline-sound-hit",
+  WON: "offline-sound-won",
   SCORE: "offline-sound-reached",
 }
 
@@ -391,12 +392,13 @@ Runner.prototype = {
       const mobileSpeed =
         ((speed * this.dimensions.WIDTH) / DEFAULT_WIDTH) *
         this.config.MOBILE_SPEED_COEFFICIENT
-      this.currentSpeed = mobileSpeed > speed ? speed : mobileSpeed
+      this.currentSpeed = speed // mobileSpeed > speed ? speed : mobileSpeed
     } else if (opt_speed) this.currentSpeed = opt_speed
+    console.log("current speed", this.currentSpeed)
   },
 
   /**
-   * Game initialiser.
+   * Game initializer.
    */
   init() {
     // Hide the static icon.
@@ -569,9 +571,9 @@ Runner.prototype = {
       this.onVisibilityChange.bind(this)
     )
 
-    window.addEventListener(Runner.events.BLUR, this.onVisibilityChange.bind(this))
+    // window.addEventListener(Runner.events.BLUR, this.onVisibilityChange.bind(this))
 
-    window.addEventListener(Runner.events.FOCUS, this.onVisibilityChange.bind(this))
+    // window.addEventListener(Runner.events.FOCUS, this.onVisibilityChange.bind(this))
   },
 
   clearCanvas() {
@@ -635,7 +637,7 @@ Runner.prototype = {
         Math.ceil(this.distanceRan)
       )
 
-      if (playAchievementSound) this.playSound(this.soundFx.SCORE)
+      // if (playAchievementSound) this.playSound(this.soundFx.SCORE)
 
       // Night mode.
       if (this.invertTimer > this.config.INVERT_FADE_DURATION) {
@@ -754,6 +756,7 @@ Runner.prototype = {
               this.createTouchController()
 
             await window.onDino.onStart()
+            console.log("speed after start", this.currentSpeed)
             this.waitingForStart = false
             this.loadSounds()
             this.setPlayStatus(true)
@@ -1211,8 +1214,12 @@ Runner.updateCanvasScaling = function(canvas, opt_width, opt_height) {
  * @param {number} max
  */
 function getRandomNum(min, max, type) {
-  if (window.randomFns && window.randomFns[type])
-    return Math.floor(window.randomFns[type]() * (max - min + 1)) + min
+  if (window.randomFns && window.randomFns[type]) {
+    const n = window.randomFns[type]()
+    const rng = Math.floor(n * (max - min + 1)) + min
+    console.log("randomNum", type, rng, n)
+    return rng
+  }
 
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
@@ -1568,6 +1575,7 @@ Obstacle.prototype = {
    * @param {number} speed
    */
   init(speed) {
+    console.log("init obstacle", speed)
     this.cloneCollisionBoxes()
 
     // Only allow sizing if we're at the right speed.
@@ -1600,7 +1608,9 @@ Obstacle.prototype = {
     // For obstacles that go at a different speed from the horizon.
     if (this.typeConfig.speedOffset)
       this.speedOffset =
-        Math.random() > 0.5 ? this.typeConfig.speedOffset : -this.typeConfig.speedOffset
+        getRandomNum(0, 1, "obstacleSpeedOffset") > 0.5
+          ? this.typeConfig.speedOffset
+          : -this.typeConfig.speedOffset
 
     this.gap = this.getGap(this.gapCoefficient, speed)
   },
@@ -3072,9 +3082,10 @@ Horizon.prototype = {
     if (
       this.duplicateObstacleCheck(obstacleType.type) ||
       currentSpeed < obstacleType.minSpeed
-    )
+    ) {
       this.addNewObstacle(currentSpeed)
-    else {
+      console.log("duplicate obstacle")
+    } else {
       const obstacleSpritePos = this.spritePos[obstacleType.type]
 
       this.obstacles.push(

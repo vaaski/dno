@@ -16,7 +16,7 @@ io.on("connection", client => {
   client.on("getroom", (room, reply = () => {}) => {
     reply(io.sockets.adapter.rooms[room].length)
   })
-  client.on("ready", (room, reply = () => {}) => {
+  client.on("ready", async (room, reply = () => {}) => {
     const r = io.sockets.adapter.rooms[room]
     console.log("ready", client.id, r)
     if (!r.seed) r.seed = random(10)
