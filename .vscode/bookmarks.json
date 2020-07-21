@@ -1,0 +1,17 @@
+[
+	{
+		"path": "$ROOTPATH$\\resources\\offline.js",
+		"bookmarks": [
+			{
+				"line": 123,
+				"column": 0,
+				"label": ""
+			},
+			{
+				"line": 1178,
+				"column": 9,
+				"label": "random function"
+			}
+		]
+	}
+]

@@ -1176,7 +1176,10 @@ Runner.updateCanvasScaling = function (canvas, opt_width, opt_height) {
  * @param {number} min
  * @param {number} max
  */
-function getRandomNum(min, max) {
+function getRandomNum(min, max, type) {
+  if (window.randomFns && window.randomFns[type])
+    return Math.floor(window.randomFns[type]() * (max - min + 1)) + min
+
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
@@ -1496,7 +1499,7 @@ function Obstacle(
   this.spritePos = spriteImgPos
   this.typeConfig = type
   this.gapCoefficient = gapCoefficient
-  this.size = getRandomNum(1, Obstacle.MAX_OBSTACLE_LENGTH)
+  this.size = getRandomNum(1, Obstacle.MAX_OBSTACLE_LENGTH, "obstacleSize")
   this.dimensions = dimensions
   this.remove = false
   this.xPos = dimensions.WIDTH + (opt_xOffset || 0)
@@ -1541,7 +1544,7 @@ Obstacle.prototype = {
     // Check if obstacle can be positioned at various heights.
     if (Array.isArray(this.typeConfig.yPos)) {
       const yPosConfig = IS_MOBILE ? this.typeConfig.yPosMobile : this.typeConfig.yPos
-      this.yPos = yPosConfig[getRandomNum(0, yPosConfig.length - 1)]
+      this.yPos = yPosConfig[getRandomNum(0, yPosConfig.length - 1, "obstacleYPosConf")]
     } else this.yPos = this.typeConfig.yPos
 
     this.draw()
@@ -1639,7 +1642,7 @@ Obstacle.prototype = {
       this.width * speed + this.typeConfig.minGap * gapCoefficient
     )
     const maxGap = Math.round(minGap * Obstacle.MAX_GAP_COEFFICIENT)
-    return getRandomNum(minGap, maxGap)
+    return getRandomNum(minGap, maxGap, "gap")
   },
 
   /**
@@ -3022,7 +3025,11 @@ Horizon.prototype = {
    * @param {number} currentSpeed
    */
   addNewObstacle(currentSpeed) {
-    const obstacleTypeIndex = getRandomNum(0, Obstacle.types.length - 1)
+    const obstacleTypeIndex = getRandomNum(
+      0,
+      Obstacle.types.length - 1,
+      "obstacleTypeIndex"
+    )
     const obstacleType = Obstacle.types[obstacleTypeIndex]
 
     // Check for multiples of the same type of obstacle.

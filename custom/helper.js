@@ -26,18 +26,28 @@
   window.onload = () => {
     const { scrollWidth } = document.documentElement
     const runnerStyles = `.offline #main-frame-error > .runner-container { image-rendering: pixelated; margin: 0; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(${
-      scrollWidth / 1.5 / 600
+      // eslint-disable-next-line no-inline-comments
+      1 // scrollWidth / 1.5 / 600
     }) }`
-    const rnst = document.createElement("style")
-    rnst.innerHTML = runnerStyles
-    document.body.appendChild(rnst)
+    const runnerStyle = document.createElement("style")
+    runnerStyle.innerHTML = runnerStyles
+    document.body.appendChild(runnerStyle)
 
     document.firstElementChild.classList.add("offline")
     qq(".icon").forEach(i => i.classList.add("icon-offline"))
 
+    window.renewRandomSeeds = seed => {
+      window.randomFns = {
+        obstacleSize: (() => new Math.seedrandom(`obstacleSize-${seed}`))(),
+        obstacleYPosConf: (() => new Math.seedrandom(`obstacleYPosConf-${seed}`))(),
+        gap: (() => new Math.seedrandom(`gap-${seed}`))(),
+        obstacleTypeIndex: (() => new Math.seedrandom(`obstacleTypeIndex-${seed}`))(),
+      }
+    }
+    renewRandomSeeds("tester")
+
     window.r = new Runner(".interstitial-wrapper", {
-      MAX_SPEED: 20,
-      ACCELERATION: 0.1,
+      SPEED: 13,
     })
   }
 })()
