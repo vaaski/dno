@@ -24,8 +24,11 @@ body, html
   height: 100%
   width: 100%
   background: #eee
+  color: #111
+  font-family: "Roboto Mono", monospace
 
 @media (prefers-color-scheme: dark)
   #app
     background: #111
+    color: #eee
 </style>

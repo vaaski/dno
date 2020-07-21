@@ -13,8 +13,8 @@
       <div id="audio-resources">
         <audio id="offline-sound-press" src="../assets/sounds/button-press.mp3"></audio>
         <audio id="offline-sound-hit" src="../assets/sounds/hit.mp3"></audio>
-        <audio id="offline-sound-reached" src="../assets/sounds/score-reached.mp3"></audio>
-        <!-- <audio id="offline-sound-reached" src="../custom/bruh.mp3"></audio> -->
+        <!-- <audio id="offline-sound-reached" src="../assets/sounds/score-reached.mp3"></audio> -->
+        <audio id="offline-sound-reached" src="../assets/sounds/bruh.mp3"></audio>
       </div>
     </div>
   </div>

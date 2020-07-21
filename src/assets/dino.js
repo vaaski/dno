@@ -48,7 +48,7 @@ const loadTimeData = {
  */
 function Runner(outerContainer, opt_config = {}) {
   // Singleton
-  if (Runner.instance_) return Runner.instance_
+  // if (Runner.instance_) return Runner.instance_
 
   Runner.instance_ = this
 
@@ -87,6 +87,9 @@ function Runner(outerContainer, opt_config = {}) {
 
   this.activated = false // Whether the easter egg has been activated.
   this.playing = false // Whether the game is currently in play state.
+
+  this.waitingForStart = false
+
   this.crashed = false
   this.paused = false
   this.inverted = false
@@ -733,7 +736,7 @@ Runner.prototype = {
    * Process keydown.
    * @param {Event} e
    */
-  onKeyDown(e) {
+  async onKeyDown(e) {
     // Prevent native page scrolling whilst tapping on mobile.
     if (IS_MOBILE && this.playing) e.preventDefault()
 
@@ -743,10 +746,15 @@ Runner.prototype = {
           e.preventDefault()
           // Starting the game for the first time.
           if (!this.playing) {
+            if (this.waitingForStart) return
+            this.waitingForStart = true
+
             // Started by touch so create a touch controller.
             if (!this.touchController && e.type === Runner.events.TOUCHSTART)
               this.createTouchController()
 
+            await window.onDino.onStart()
+            this.waitingForStart = false
             this.loadSounds()
             this.setPlayStatus(true)
             this.update()
@@ -1015,6 +1023,7 @@ Runner.prototype = {
 
     // Reset the time clock.
     this.time = getTimeStamp()
+    window.onDino.onCrash()
   },
 
   stop() {
@@ -2356,6 +2365,7 @@ DistanceMeter.prototype = {
    * Draw the high score.
    */
   drawHighScore() {
+    return // ? disabled
     this.canvasCtx.save()
     this.canvasCtx.globalAlpha = 0.8
     for (let i = this.highScore.length - 1; i >= 0; i--)

@@ -6,8 +6,18 @@ Vue.use(VueRouter)
 const routes = [
   {
     path: "/",
+    name: "roomselect",
+    component: require("./views/roomselect.vue").default,
+  },
+  {
+    path: "/g/:room",
+    alias: "/game/:room",
     name: "game",
     component: require("./views/game.vue").default,
+  },
+  {
+    path: "*",
+    redirect: "/",
   },
   //   {
   //     path: "/about",
