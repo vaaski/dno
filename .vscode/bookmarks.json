@@ -1,16 +1,11 @@
 [
 	{
-		"path": "$ROOTPATH$\\resources\\offline.js",
+		"path": "$ROOTPATH$\\src\\assets\\dino.js",
 		"bookmarks": [
 			{
-				"line": 123,
-				"column": 0,
+				"line": 1203,
+				"column": 21,
 				"label": ""
-			},
-			{
-				"line": 1178,
-				"column": 9,
-				"label": "random function"
 			}
 		]
 	}
