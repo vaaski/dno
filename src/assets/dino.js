@@ -31,7 +31,7 @@ const loadTimeData = {
   },
   valueExists: s => {
     const b = loadTimeData.data[s]
-    if (b === undefined) console.log("value doesn't exist:", s, b)
+    if (b === undefined) window.log("value doesn't exist:", s, b)
 
     return Boolean(b)
   },
@@ -394,7 +394,7 @@ Runner.prototype = {
         this.config.MOBILE_SPEED_COEFFICIENT
       this.currentSpeed = speed // mobileSpeed > speed ? speed : mobileSpeed
     } else if (opt_speed) this.currentSpeed = opt_speed
-    console.log("current speed", this.currentSpeed)
+    window.log("current speed", this.currentSpeed)
   },
 
   /**
@@ -447,7 +447,7 @@ Runner.prototype = {
     this.startListening()
     this.update()
 
-    window.addEventListener(Runner.events.RESIZE, this.debounceResize.bind(this))
+    // window.addEventListener(Runner.events.RESIZE, this.debounceResize.bind(this))
 
     // Handle dark mode
     const darkModeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
@@ -566,10 +566,10 @@ Runner.prototype = {
     this.playCount++
 
     // Handle tabbing off the page. Pause the current game.
-    document.addEventListener(
-      Runner.events.VISIBILITY,
-      this.onVisibilityChange.bind(this)
-    )
+    // document.addEventListener(
+    //   Runner.events.VISIBILITY,
+    //   this.onVisibilityChange.bind(this)
+    // )
 
     // window.addEventListener(Runner.events.BLUR, this.onVisibilityChange.bind(this))
 
@@ -756,7 +756,7 @@ Runner.prototype = {
               this.createTouchController()
 
             await window.onDino.onStart()
-            console.log("speed after start", this.currentSpeed)
+            window.log("speed after start", this.currentSpeed)
             this.waitingForStart = false
             this.loadSounds()
             this.setPlayStatus(true)
@@ -816,6 +816,7 @@ Runner.prototype = {
         this.handleGameOverClicks(e)
     } else if (this.paused && isjumpKey) {
       // Reset the jump state
+      return
       this.tRex.reset()
       this.play()
     }
@@ -1217,7 +1218,7 @@ function getRandomNum(min, max, type) {
   if (window.randomFns && window.randomFns[type]) {
     const n = window.randomFns[type]()
     const rng = Math.floor(n * (max - min + 1)) + min
-    console.log("randomNum", type, rng, n)
+    window.log("randomNum", type, rng, n)
     return rng
   }
 
@@ -1575,7 +1576,7 @@ Obstacle.prototype = {
    * @param {number} speed
    */
   init(speed) {
-    console.log("init obstacle", speed)
+    window.log("init obstacle", speed)
     this.cloneCollisionBoxes()
 
     // Only allow sizing if we're at the right speed.
@@ -3084,7 +3085,7 @@ Horizon.prototype = {
       currentSpeed < obstacleType.minSpeed
     ) {
       this.addNewObstacle(currentSpeed)
-      console.log("duplicate obstacle")
+      window.log("duplicate obstacle")
     } else {
       const obstacleSpritePos = this.spritePos[obstacleType.type]
 

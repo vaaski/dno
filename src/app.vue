@@ -20,6 +20,17 @@ body, html
   height: 100%
   width: 100%
 
+html
+  filter: invert(0)
+  transition: filter 1s
+
+  &.inverted
+    filter: invert(1)
+
+    @media (prefers-color-scheme: dark)
+      .runner-canvas
+        filter: invert(0) !important
+
 #app
   height: 100%
   width: 100%

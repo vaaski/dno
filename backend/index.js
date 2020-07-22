@@ -8,13 +8,25 @@ const random = length => {
   return result
 }
 
+const getRoomConf = room => {
+  const { config, length } = io.sockets.adapter.rooms[room]
+  return { ...config, length }
+}
+
 io.on("connection", client => {
-  client.on("join", room => {
-    // console.log("joinroom", room, client.id)
+  client.on("join", (room, reply = () => {}) => {
     client.join(room)
+
+    const r = io.sockets.adapter.rooms[room]
+    if (!r.config)
+      r.config = {
+        highSpeed: false,
+      }
+    reply(getRoomConf(room))
+    io.to(room).emit("update", getRoomConf(room))
   })
   client.on("getroom", (room, reply = () => {}) => {
-    reply(io.sockets.adapter.rooms[room].length)
+    reply(getRoomConf(room))
   })
   client.on("ready", async (room, reply = () => {}) => {
     const r = io.sockets.adapter.rooms[room]
@@ -38,6 +50,19 @@ io.on("connection", client => {
       delete r.running
       delete r.seed
     }
+  })
+  client.on("pause", room => {
+    console.log("pause", client.id)
+    io.to(room).emit("pause")
+  })
+  client.on("unpause", room => {
+    console.log("unpause", client.id)
+    io.to(room).emit("unpause")
+  })
+  client.on("changeRoomConfig", ({ room, conf }) => {
+    const r = io.sockets.adapter.rooms[room]
+    r.config = { ...r.config, ...conf }
+    io.to(room).emit("update", getRoomConf(room))
   })
 })
 
