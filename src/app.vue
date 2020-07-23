@@ -36,6 +36,8 @@ html
   width: 100%
   background: #eee
   color: #111
+
+#app, input, button
   font-family: "Roboto Mono", monospace
 
 @media (prefers-color-scheme: dark)

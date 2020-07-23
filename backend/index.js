@@ -9,8 +9,8 @@ const random = length => {
 }
 
 const getRoomConf = room => {
-  const { config, length } = io.sockets.adapter.rooms[room]
-  return { ...config, length }
+  const { config, length, seed, isReady } = io.sockets.adapter.rooms[room]
+  return { ...config, length, seed, isReady }
 }
 
 io.on("connection", client => {
@@ -22,6 +22,9 @@ io.on("connection", client => {
       r.config = {
         highSpeed: false,
       }
+    if (!r.seed) r.seed = "none"
+    if (typeof r.isReady !== "number") r.isReady = 0
+
     reply(getRoomConf(room))
     io.to(room).emit("update", getRoomConf(room))
   })
@@ -31,15 +34,15 @@ io.on("connection", client => {
   client.on("ready", async (room, reply = () => {}) => {
     const r = io.sockets.adapter.rooms[room]
     console.log("ready", client.id, r)
-    if (!r.seed) r.seed = random(10)
-    if (!r.isReady) r.isReady = 1
-    else r.isReady++
+
+    r.isReady++
+
     if (r.isReady >= r.length) {
-      io.to(room).emit("start")
+      r.seed = random(10)
       r.running = r.length
-      delete r.isReady
+      r.isReady = 0
+      io.to(room).emit("start", r.seed)
     }
-    reply(r.seed)
   })
   client.on("crashed", room => {
     const r = io.sockets.adapter.rooms[room]
@@ -47,13 +50,15 @@ io.on("connection", client => {
     r.running--
     if (r.running <= 1) {
       io.to(room).emit("end")
-      delete r.running
-      delete r.seed
+      r.running = 0
     }
   })
   client.on("pause", room => {
     console.log("pause", client.id)
-    io.to(room).emit("pause")
+    const r = io.sockets.adapter.rooms[room]
+    r.seed = random(10)
+
+    io.to(room).emit("pause", r.seed)
   })
   client.on("unpause", room => {
     console.log("unpause", client.id)

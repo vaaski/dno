@@ -43,7 +43,7 @@
 import io from "socket.io-client"
 const throttle = (fn, wait) => {
   let inThrottle, lastFn, lastTime
-  return function() {
+  return function () {
     const context = this,
       args = arguments
     if (!inThrottle) {
@@ -52,7 +52,7 @@ const throttle = (fn, wait) => {
       inThrottle = true
     } else {
       clearTimeout(lastFn)
-      lastFn = setTimeout(function() {
+      lastFn = setTimeout(function () {
         if (Date.now() - lastTime >= wait) {
           fn.apply(context, args)
           lastTime = Date.now()
@@ -106,16 +106,18 @@ export default {
       if (!self.crashed) self.runner.playSound(self.runner.soundFx.WON)
       self.reInit()
     })
-    self.socket.on("pause", () => {
+    self.socket.on("pause", newSeed => {
       self.log("pause")
+      self.runner.tRex.reset()
       self.paused = true
-      self.runner.stop()
+      self.generateSeed(newSeed)
+      self.runner.horizon.obstacles = []
+      requestAnimationFrame(() => self.runner.stop())
     })
     self.socket.on("unpause", async () => {
       self.log("unpause")
       self.paused = false
       await wait(1e3)
-      self.runner.tRex.reset()
       self.runner.play()
     })
     self.socket.on("update", conf => {
@@ -136,9 +138,11 @@ export default {
       self.width = window.document.body.offsetWidth
     }, 250)
     window.document.body.onkeydown = e => {
-      self.log(e)
-      if (pauseKeys.includes(e.key)) return self.socket.emit("pause", self.room)
-      if (e.key === "u") return self.socket.emit("unpause", self.room)
+      // self.log(e)
+      if (pauseKeys.includes(e.key))
+        if (self.running && !self.paused) return self.socket.emit("pause", self.room)
+
+      if (e.key === "u" && self.running) return self.socket.emit("unpause", self.room)
     }
   },
   beforeDestroy() {
@@ -148,7 +152,11 @@ export default {
     this.socket.close()
   },
   methods: {
-    yn: a => (a ? "enabled" : "disabled"),
+    yn: a => {
+      if (a === true) return "enabled"
+      else if (a === false) return "disabled"
+      return a
+    },
     reInit() {
       this.destroy()
       this.init()
@@ -187,10 +195,11 @@ export default {
         self.crashed = false
         self.waiting = true
         self.ended = false
-        self.socket.emit("ready", self.room, seed => self.generateSeed(seed))
-        self.socket.once("start", () => {
+        self.socket.emit("ready", self.room)
+        self.socket.once("start", seed => {
           self.waiting = false
           self.running = true
+          self.generateSeed(seed)
           res()
         })
       })
@@ -207,6 +216,7 @@ export default {
     generateSeed(seed = "default") {
       const self = this
       this.log("seeded with", seed)
+      self.roomConf.seed = seed
       window.randomFns = {
         obstacleSize: (() => new self.seedrandom(`obstacleSize${seed}`))(),
         obstacleYPosConf: (() => new self.seedrandom(`obstacleYPosConf${seed}`))(),
