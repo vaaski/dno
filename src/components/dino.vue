@@ -40,10 +40,11 @@
 </template>
 
 <script>
+import Runner from "../assets/dino"
 import io from "socket.io-client"
 const throttle = (fn, wait) => {
   let inThrottle, lastFn, lastTime
-  return function () {
+  return function() {
     const context = this,
       args = arguments
     if (!inThrottle) {
@@ -52,7 +53,7 @@ const throttle = (fn, wait) => {
       inThrottle = true
     } else {
       clearTimeout(lastFn)
-      lastFn = setTimeout(function () {
+      lastFn = setTimeout(function() {
         if (Date.now() - lastTime >= wait) {
           fn.apply(context, args)
           lastTime = Date.now()
@@ -62,6 +63,10 @@ const throttle = (fn, wait) => {
   }
 }
 const wait = t => new Promise(r => setTimeout(r, t))
+const ls = (k, v) =>
+  v ? localStorage.setItem(k, JSON.stringify(v)) : JSON.parse(localStorage.getItem(k))
+
+window.setBruh = b => ls("bruhMode", b)
 
 export default {
   name: "dino",
@@ -79,6 +84,7 @@ export default {
     roomConf: {
       length: 0,
     },
+    bruhMode: ls("bruhMode"),
   }),
   computed: {
     room() {
@@ -103,7 +109,10 @@ export default {
       self.destroying = true
       self.running = false
       self.ended = true
-      if (!self.crashed) self.runner.playSound(self.runner.soundFx.WON)
+      if (!self.crashed) {
+        if (localStorage) self.runner.playSound(self.runner.soundFx.WON)
+        else self.runner.playSound(self.runner.soundFx.SCORE)
+      }
       self.reInit()
     })
     self.socket.on("pause", newSeed => {
@@ -166,14 +175,14 @@ export default {
       if (typeof this.roomConf.highSpeed === "number") SPEED = this.roomConf.highSpeed
       this.onDino()
       this.log("speed", SPEED)
-      this.runner = new this.Runner(this.$refs.wrapper, { SPEED })
+      this.runner = new Runner(this.$refs.wrapper, { SPEED })
       this.running = false
       this.waiting = false
       window.document.documentElement.classList.remove("inverted")
     },
     destroy() {
       this.destroying = true
-      this.runner.gameOver()
+      this.runner.gameOver(true)
       this.runner.stop()
       this.runner.stopListening()
       this.offDino()

@@ -67,6 +67,7 @@ export default {
     color: #fff
     padding: 6px 12px
     margin: 4px 0
+    cursor: pointer
 
   .by-id
     display: flex

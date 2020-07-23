@@ -1001,9 +1001,11 @@ Runner.prototype = {
   /**
    * Game over state.
    */
-  gameOver() {
-    this.playSound(this.soundFx.HIT)
-    vibrate(200)
+  gameOver(noSound = false) {
+    if (!noSound) {
+      this.playSound(this.soundFx.HIT)
+      vibrate(200)
+    }
 
     this.stop()
     this.crashed = true
