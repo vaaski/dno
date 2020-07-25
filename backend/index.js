@@ -20,10 +20,10 @@ io.on("connection", client => {
     const r = io.sockets.adapter.rooms[room]
     if (!r.config)
       r.config = {
-        highSpeed: false,
+        speed: false,
       }
     if (!r.seed) r.seed = "none"
-    if (typeof r.isReady !== "number") r.isReady = 0
+    r.isReady = 0
 
     reply(getRoomConf(room))
     io.to(room).emit("update", getRoomConf(room))
@@ -43,6 +43,7 @@ io.on("connection", client => {
       r.isReady = 0
       io.to(room).emit("start", r.seed)
     }
+    io.to(room).emit("update", getRoomConf(room))
   })
   client.on("crashed", room => {
     const r = io.sockets.adapter.rooms[room]
@@ -69,6 +70,7 @@ io.on("connection", client => {
     r.config = { ...r.config, ...conf }
     io.to(room).emit("update", getRoomConf(room))
   })
+  client.on("reInit", room => io.to(room).emit("reInit"))
 })
 
 io.listen(7934)

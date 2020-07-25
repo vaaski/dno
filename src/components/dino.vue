@@ -44,7 +44,7 @@ import Runner from "../assets/dino"
 import io from "socket.io-client"
 const throttle = (fn, wait) => {
   let inThrottle, lastFn, lastTime
-  return function() {
+  return function () {
     const context = this,
       args = arguments
     if (!inThrottle) {
@@ -53,7 +53,7 @@ const throttle = (fn, wait) => {
       inThrottle = true
     } else {
       clearTimeout(lastFn)
-      lastFn = setTimeout(function() {
+      lastFn = setTimeout(function () {
         if (Date.now() - lastTime >= wait) {
           fn.apply(context, args)
           lastTime = Date.now()
@@ -129,11 +129,16 @@ export default {
       await wait(1e3)
       self.runner.play()
     })
-    self.socket.on("update", conf => {
+    self.socket.on("update", async conf => {
       self.log("update", conf)
+      if (self.roomConf.speed !== conf.speed) {
+        self.log("speed change", self.roomConf.speed, "to", conf.speed)
+        await self.$nextTick()
+        self.reInit()
+      }
       self.roomConf = conf
-      self.reInit()
     })
+    self.socket.on("reInit", self.reInit)
 
     this.offDino()
   },
@@ -147,11 +152,16 @@ export default {
       self.width = window.document.body.offsetWidth
     }, 250)
     window.document.body.onkeydown = e => {
-      // self.log(e)
       if (pauseKeys.includes(e.key))
-        if (self.running && !self.paused) return self.socket.emit("pause", self.room)
+        if (self.running && !self.paused) {
+          self.log("emit pause")
+          return self.socket.emit("pause", self.room)
+        }
 
-      if (e.key === "u" && self.running) return self.socket.emit("unpause", self.room)
+      if (e.key === "u" && self.paused) {
+        self.log("emit unpause")
+        return self.socket.emit("unpause", self.room)
+      }
     }
   },
   beforeDestroy() {
@@ -167,14 +177,15 @@ export default {
       return a
     },
     reInit() {
+      self.log("reInit")
       this.destroy()
       this.init()
     },
     init() {
       let SPEED = 13
-      if (typeof this.roomConf.highSpeed === "number") SPEED = this.roomConf.highSpeed
+      if (typeof this.roomConf.speed === "number") SPEED = this.roomConf.speed
       this.onDino()
-      this.log("speed", SPEED)
+      this.log("init speed", SPEED)
       this.runner = new Runner(this.$refs.wrapper, { SPEED })
       this.running = false
       this.waiting = false

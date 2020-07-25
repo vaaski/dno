@@ -3,7 +3,6 @@ import App from "./app.vue"
 // import "./registerServiceWorker"
 import router from "./router"
 import store from "./store"
-// import Runner from "./assets/dino"
 import seedrandom from "seedrandom"
 
 Vue.config.productionTip = false
@@ -15,7 +14,7 @@ Vue.dev = Vue.prototype.dev = process.env.NODE_ENV === "development"
 const log = (...t) => {
   if (!Vue.dev && !window.forcelog) return
   const time = new Date()
-  console.log(`[${time.toLocaleTimeString()}]`, ...t)
+  console.log(`%c[${time.toLocaleTimeString("de")}]`, "color:grey", ...t)
 }
 Vue.log = Vue.prototype.log = log
 window.log = log
