@@ -1,19 +1,4 @@
-# dnov
+# dno
+## A work-in-progress multiplayer version of the chrome dino game.
 
-## Project setup
-```
-yarn install
-```
-
-### Compiles and hot-reloads for development
-```
-yarn serve
-```
-
-### Compiles and minifies for production
-```
-yarn build
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+You can give it a try at [dno.vaaski.dev](https://dno.vaaski.dev). Not very bug-free ATM
